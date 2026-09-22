@@ -64,6 +64,10 @@ extern "C" {
   /* TIM1 挂在 APB2。F1 的 APB2 分频为 1 -> 定时器时钟 = 72MHz */
   #define BSP_TIM1_CLK_HZ       72000000U
 
+  /* 控制节拍定时器 TIM4 挂在 APB1。
+   * F1 的 APB1 分频为 2 (≠1)，所以定时器时钟 = 36 × 2 = 72MHz */
+  #define BSP_TICK_TIM_CLK_HZ   72000000U
+
 #elif defined(STM32F407xx)
   /* ---------------- STM32F407VET6 (后续升级目标) ---------------- */
   #include "stm32f4xx_hal.h"
@@ -85,6 +89,10 @@ extern "C" {
    * TB6612 的开关损耗会明显上升。 */
   #define BSP_TIM1_CLK_HZ       168000000U
 
+  /* 控制节拍定时器 TIM4 挂在 APB1。
+   * F4 的 APB1 分频为 4 (≠1)，所以定时器时钟 = 42 × 2 = 84MHz */
+  #define BSP_TICK_TIM_CLK_HZ   84000000U
+
 #else
   #error "bsp_config.h: 未支持的 MCU。请在此处添加对应系列的分支（参考上两条）。"
 #endif
@@ -93,8 +101,28 @@ extern "C" {
  * 1. 控制周期与采样窗口
  * ========================================================================== */
 
-/** 主控制周期 (ms)。SysTick 每 CTRL_PERIOD_MS 置一次控制标志 */
+/** 主控制周期 (ms)。由 TIM4 定时中断置位控制标志，主循环消费 */
 #define CTRL_PERIOD_MS          5U
+
+/* --------------------------------------------------------------------------
+ * 控制节拍定时器：TIM4
+ *
+ * 为什么不用 SysTick 做控制节拍：
+ *   CubeMX 生成的 stm32f1xx_it.c 里**必定**包含 SysTick_Handler
+ *   （用于 HAL_IncTick），如果本工程也在 main.c 里定义 SysTick_Handler，
+ *   链接时就会重复定义；而且每次重新生成 CubeMX 工程都会再冲突一次。
+ *
+ *   改用独立硬件定时器 TIM4 后：
+ *     - SysTick 完全交给 HAL，stm32f1xx_it.c 一个字都不用改
+ *     - 控制节拍由硬件定时器产生，比"在 SysTick 里分频"更精确
+ *     - 即使 HAL_Delay 阻塞（如 IMU 初始化）也不影响节拍的独立性
+ *
+ *   TIM4 时基分频到 10kHz，再计 10×CTRL_PERIOD_MS 个数得到控制周期：
+ *     5ms -> 10kHz 下数 50 个 (ARR = 49)
+ * -------------------------------------------------------------------------- */
+#define BSP_TICK_TIM_PSC        ((BSP_TICK_TIM_CLK_HZ / 10000U) - 1U)
+#define BSP_TICK_TIM_ARR        ((CTRL_PERIOD_MS * 10U) - 1U)
+#define BSP_TICK_TIM_IRQn       TIM4_IRQn
 
 /** 速度环采样窗口 = 多少个控制周期。
  *  MG520 输出轴一圈 1320 counts（11 线 × 30 减速比 × 4 倍频），

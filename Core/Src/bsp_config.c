@@ -9,6 +9,7 @@
 
 #include "bsp_config.h"
 #include "main.h"       /* Error_Handler */
+#include "app.h"        /* App_Tick_ControlSet（TIM4 中断里调用） */
 
 /* ==========================================================================
  * 外设句柄定义（其他模块通过 bsp_config.h 里的 extern 声明引用）
@@ -381,17 +382,64 @@ static void Bsp_Uart_Init(void)
 }
 
 /* ==========================================================================
- * 7. 总入口
+ * 7. 控制节拍定时器：TIM4
+ *
+ *    SysTick 留给 HAL 做 1ms 时基（HAL_Init 已经配好），
+ *    控制节拍改用 TIM4，避免与 CubeMX 生成的 SysTick_Handler 重复定义。
+ * ========================================================================== */
+static TIM_HandleTypeDef htim4_tick;
+
+static void Bsp_ControlTick_Init(void)
+{
+    __HAL_RCC_TIM4_CLK_ENABLE();
+
+    htim4_tick.Instance               = TIM4;
+    htim4_tick.Init.Prescaler         = BSP_TICK_TIM_PSC;    /* 分频到 10kHz */
+    htim4_tick.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    htim4_tick.Init.Period            = BSP_TICK_TIM_ARR;    /* 5ms */
+    htim4_tick.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    htim4_tick.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+    if (HAL_TIM_Base_Init(&htim4_tick) != HAL_OK) {
+        Error_Handler();
+    }
+
+    /* 控制节拍给最高优先级：即使串口/IMU 中断在跑，节拍也不会被推迟，
+     * 保证控制周期的时间抖动最小。中断里只置标志，没有耗时操作。 */
+    HAL_NVIC_SetPriority(BSP_TICK_TIM_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(BSP_TICK_TIM_IRQn);
+
+    HAL_TIM_Base_Start_IT(&htim4_tick);
+}
+
+/**
+ * @brief  TIM4 更新中断：控制节拍
+ * @note   只置标志，真正的控制运算在主循环里做。
+ *         中断里做运算会拖长中断时间、影响串口接收的实时性。
+ */
+void TIM4_IRQHandler(void)
+{
+    if (__HAL_TIM_GET_FLAG(&htim4_tick, TIM_FLAG_UPDATE) != RESET) {
+        if (__HAL_TIM_GET_IT_SOURCE(&htim4_tick, TIM_IT_UPDATE) != RESET) {
+            __HAL_TIM_CLEAR_IT(&htim4_tick, TIM_IT_UPDATE);
+            App_Tick_ControlSet();
+        }
+    }
+}
+
+/* ==========================================================================
+ * 8. 总入口
  * ========================================================================== */
 void Bsp_Init(void)
 {
     Bsp_Clock_Config();
 
-    /* HAL_Init() 已在 main() 最先调用，此处只需保证 SysTick 为 1ms 基准 */
-    HAL_SYSTICK_Config(SystemCoreClock / 1000U);
+    /* 注意：不再调用 HAL_SYSTICK_Config()。
+     * HAL_Init() 已经把 SysTick 配成 1ms 时基，供 HAL_Delay 使用；
+     * 控制节拍由下面的 TIM4 负责。 */
 
     Bsp_Gpio_Init();
     Bsp_Pwm_Init();
     Bsp_Encoder_Init();
     Bsp_Uart_Init();
+    Bsp_ControlTick_Init();
 }

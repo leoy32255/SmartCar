@@ -5,18 +5,26 @@
   *
   *          调度结构（裸机，不用 FreeRTOS）：
   *
-  *            SysTick (1ms 中断)
-  *              └─> App_Tick_1ms()  累加毫秒数
-  *                     └─> 每 CTRL_PERIOD_MS 置一次 s_ctrl_flag
-  *
-  *            main() while(1)
+  *            SysTick (1ms, 归 HAL)          TIM4 (CTRL_PERIOD_MS, 归本工程)
+  *              └─> HAL_IncTick()              └─> App_Tick_ControlSet()
+  *                    维护 uwTick 供            └─> 置 s_ctrl_flag
+  *                    HAL_Delay/GetTick 用              │
+  *                                                      │
+  *            main() while(1)                           │
   *              ├─> Comm_Update()          ← 每圈都跑，保证串口不丢数据
-  *              └─> if (控制标志) 控制任务   ← 严格 5ms 周期
+  *              └─> if (s_ctrl_flag) ◄──────────────────┘
+  *                     控制任务 ← 严格 CTRL_PERIOD_MS 周期
   *                     ├─ Imu_ReadData + Filter_Update
   *                     ├─ Track_ReadSensors
   *                     ├─ Encoder_Update
   *                     ├─ 按模式调度 Control_*
   *                     └─ Led_Task
+  *
+  *          为什么控制节拍用 TIM4 而不是 SysTick：
+  *            CubeMX 生成的 stm32f1xx_it.c 必定包含 SysTick_Handler
+  *            （HAL 的 1ms 时基），本工程若再定义一次就会链接冲突，
+  *            且每次重新生成 CubeMX 工程都会复发。
+  *            改用 TIM4 后 SysTick 完全归 HAL，生成的文件一个字不用改。
   *
   *          为什么不用 FreeRTOS：
   *            F103C8T6 只有 20KB RAM，FreeRTOS 的任务栈 + 内核对象
@@ -55,10 +63,11 @@ typedef enum {
 void App_Init(void);
 
 /**
- * @brief  SysTick 1ms 中断回调
- * @note   必须在 SysTick_Handler 里调用，且要同时调用 HAL_IncTick()。
+ * @brief  置位"控制周期到"标志
+ * @note   由 bsp_config.c 里的 TIM4 中断调用（见 TIM4_IRQHandler）。
+ *         中断里只做这一件事，控制运算全部留给主循环。
  */
-void App_Tick_1ms(void);
+void App_Tick_ControlSet(void);
 
 /**
  * @brief  主循环任务

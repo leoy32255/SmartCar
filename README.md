@@ -96,7 +96,9 @@ SmartCar/
 ### 时间片调度（裸机）
 
 ```
-SysTick 1ms 中断 ─> App_Tick_1ms() ─> 每 5ms 置一次控制标志
+SysTick 1ms (归 HAL)          TIM4 5ms (归本工程)
+  └─ HAL_IncTick()              └─ App_Tick_ControlSet()
+     └─ HAL_GetTick/Delay 用        └─ 置控制标志
 
 main() while(1)
   ├─ Comm_Update()        每圈都跑（保证串口不丢字节）
@@ -107,6 +109,11 @@ main() while(1)
        ├─ 按模式调度 Control_*
        └─ Led_Task
 ```
+
+> 控制节拍用 **TIM4 而不是 SysTick**：CubeMX 生成的 `stm32f1xx_it.c` 里
+> 必定包含 `SysTick_Handler`（HAL 的 1ms 时基）。本工程若再定义一次就会
+> 链接冲突，而且每次重新生成 CubeMX 都会复发。改用 TIM4 后 SysTick 完全
+> 归 HAL，CubeMX 生成的文件一个字都不用改。
 
 > 没上 FreeRTOS 的原因：F103C8T6 只有 20KB RAM，RTOS 的任务栈 + 内核对象
 > 要吃掉 3~4KB，而本项目只有"控制"和"通信"两个任务且周期固定，

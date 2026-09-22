@@ -17,8 +17,11 @@
   *          这样做的好处是换 MCU（比如后续换 F407VET6）时，
   *          业务代码一行不用动，只重写 bsp_config.* 即可。
   *
-  *          【注意】stm32f1xx_it.c 里不要再定义 SysTick_Handler / EXTI0_IRQHandler /
-  *          USART2_IRQHandler，否则与本工程的实现重复定义，链接会报错。
+  *          【注意】CubeMX 里**不要**给 TIM1 / TIM2 / TIM3 / TIM4 / USART2 / EXTI0
+  *          勾选 NVIC 中断。它们的中断服务程序由本工程提供
+  *          （TIM4 在 bsp_config.c，EXTI0 在 imu.c，USART2 在 comm.c），
+  *          勾了会生成重复的函数，链接时报 defined multiple times。
+  *          SysTick 例外：它是 HAL 的 1ms 时基，必须保留给 CubeMX 生成。
   ******************************************************************************
   */
 
@@ -27,23 +30,19 @@
 #include "app.h"
 
 /* ==========================================================================
- * 中断服务程序
+ * 中断服务程序分布（本文件不定义任何 ISR）
+ *
+ *   SysTick_Handler   -> stm32f1xx_it.c  （CubeMX 生成，只调 HAL_IncTick）
+ *   TIM4_IRQHandler   -> bsp_config.c    （控制节拍，5ms）
+ *   EXTI0_IRQHandler  -> imu.c           （MPU6500 数据就绪）
+ *   USART2_IRQHandler -> comm.c          （蓝牙收发）
+ *
+ *   这样安排的好处：
+ *     - SysTick 归 HAL，CubeMX 生成的 stm32f1xx_it.c **一个字都不用改**，
+ *       重新生成工程也不会和本工程重复定义。
+ *     - 其余中断放在各自模块里，符合"外设中断由驱动层自己管"的分层原则；
+ *       只要在 CubeMX 里不勾 TIM4 / EXTI0 / USART2 的 NVIC 中断即可。
  * ========================================================================== */
-
-/**
- * @brief  SysTick 中断（HAL 时基 + 控制节拍）
- * @note   HAL_IncTick() 必须在最前面，它是 HAL_Delay / HAL_GetTick 的基础。
- *         控制节拍的置位由 App_Tick_1ms() 内部按 CTRL_PERIOD_MS 分频。
- */
-void SysTick_Handler(void)
-{
-    HAL_IncTick();
-    App_Tick_1ms();
-}
-
-/* EXTI0_IRQHandler  -> imu.c（MPU6500 数据就绪）
- * USART2_IRQHandler -> comm.c（蓝牙收发）
- * 放在各自模块里，符合"外设中断由驱动层自己管"的分层原则。 */
 
 /* ==========================================================================
  * 入口
@@ -62,7 +61,7 @@ int main(void)
 
     /* ---- 4. 主循环 ----
      * Comm_Update() 每圈都跑（保证接收不丢字节），
-     * 控制任务由 SysTick 置的标志触发，严格 5ms 一次。 */
+     * 控制任务由 TIM4 置的标志触发，严格 CTRL_PERIOD_MS 一次。 */
     while (1) {
         App_Loop();
     }

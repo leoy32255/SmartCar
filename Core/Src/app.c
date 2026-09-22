@@ -15,10 +15,10 @@
 #include "comm.h"
 #include "led.h"
 
-/* ---- 调度 ---- */
-static volatile uint32_t s_tick_ms    = 0;
+/* ---- 调度 ----
+ * 毫秒时间统一用 HAL_GetTick()（uwTick 由 SysTick_Handler 里的 HAL_IncTick
+ * 维护），本模块不再自己维护毫秒计数，避免两套时间基准不一致。 */
 static volatile uint8_t  s_ctrl_flag  = 0;
-static uint8_t           s_tick_div   = 0;
 
 /* ---- 状态 ---- */
 static AppMode_t s_mode        = APP_MODE_STOP;
@@ -212,19 +212,15 @@ void App_Init(void)
  * 调度
  * ========================================================================== */
 
-void App_Tick_1ms(void)
+void App_Tick_ControlSet(void)
 {
-    s_tick_ms++;
-
-    s_tick_div++;
-    if (s_tick_div >= CTRL_PERIOD_MS) {
-        s_tick_div = 0;
-        s_ctrl_flag = 1;
-    }
+    s_ctrl_flag = 1;
 }
 
 void App_Loop(void)
 {
+    uint8_t pending;
+
     /* 通信每圈都跑：9600 波特率下一字节约 1ms，
      * 主循环两圈（约 1~2μs）就能取走，完全跟得上。 */
     Comm_Update();
@@ -253,9 +249,16 @@ void App_Loop(void)
         }
     }
 
-    /* 控制任务：严格按周期执行 */
-    if (s_ctrl_flag) {
-        s_ctrl_flag = 0;
+    /* 控制任务：按 TIM4 节拍执行。
+     * 读标志 + 清零必须放在临界区里：否则若在"读"之后、"清"之前
+     * TIM4 中断置了位，这一拍就会被丢掉，控制周期会偶尔变成 10ms。
+     * 主循环顶层中断必定是开着的，所以这里直接开关总中断即可。 */
+    __disable_irq();
+    pending = s_ctrl_flag;
+    s_ctrl_flag = 0;
+    __enable_irq();
+
+    if (pending) {
         app_control_task();
     }
 }
@@ -317,4 +320,6 @@ void App_SetYawHold(uint8_t enable, float target_yaw)
 void App_SetTelemetryEnabled(uint8_t enable) { s_telem_en = enable ? 1U : 0U; }
 uint8_t App_IsTelemetryEnabled(void)         { return s_telem_en; }
 uint8_t App_IsImuReady(void)                 { return s_imu_ready; }
-uint32_t App_GetTickMs(void)                 { return s_tick_ms; }
+
+/** 系统运行毫秒数。直接复用 HAL 的时基，保证与 HAL_Delay 同源 */
+uint32_t App_GetTickMs(void)                 { return HAL_GetTick(); }

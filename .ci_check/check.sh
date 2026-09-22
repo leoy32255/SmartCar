@@ -44,6 +44,7 @@ check_target() {
     fi
 
     local n_ok=0
+    local n_bad=0
     for f in Core/Src/*.c; do
         local out
         out=$("$CC" -std=c11 $WARN -fsyntax-only -D"$def" -DUSE_HAL_DRIVER $INC "$f" 2>&1)
@@ -51,11 +52,16 @@ check_target() {
             echo "  [失败] $f"
             echo "$out" | sed 's/^/         /' | head -20
             fail=1
+            n_bad=$((n_bad + 1))
         else
             n_ok=$((n_ok + 1))
         fi
     done
-    echo "  $n_ok 个文件通过，无警告"
+    if [ "$n_bad" -eq 0 ]; then
+        echo "  $n_ok 个文件通过，无警告无错误"
+    else
+        echo "  $n_ok 个文件通过，$n_bad 个文件失败"
+    fi
     echo
 }
 

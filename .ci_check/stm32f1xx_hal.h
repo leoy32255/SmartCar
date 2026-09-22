@@ -96,6 +96,9 @@ typedef struct {
 #define TIM_COUNTERMODE_UP 0U
 #define TIM_CLOCKDIVISION_DIV1 0U
 #define TIM_AUTORELOAD_PRELOAD_DISABLE 0U
+#define TIM_AUTORELOAD_PRELOAD_ENABLE  0x0080U
+#define TIM_IT_UPDATE  0x0001U
+#define TIM_FLAG_UPDATE 0x0001U
 #define TIM_OCMODE_PWM1 0x00000060U
 #define TIM_OCPOLARITY_HIGH 0U
 #define TIM_OCFAST_DISABLE 0U
@@ -109,6 +112,8 @@ HAL_StatusTypeDef HAL_TIM_PWM_ConfigChannel(TIM_HandleTypeDef *h, TIM_OC_InitTyp
 HAL_StatusTypeDef HAL_TIM_PWM_Start(TIM_HandleTypeDef *h, uint32_t ch);
 HAL_StatusTypeDef HAL_TIM_Encoder_Init(TIM_HandleTypeDef *h, TIM_Encoder_InitTypeDef *e);
 HAL_StatusTypeDef HAL_TIM_Encoder_Start(TIM_HandleTypeDef *h, uint32_t ch);
+HAL_StatusTypeDef HAL_TIM_Base_Init(TIM_HandleTypeDef *h);
+HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *h);
 
 /* ---- UART ---- */
 typedef struct { volatile uint32_t SR, DR, BRR, CR1, CR2, CR3, GTPR; } USART_TypeDef;
@@ -178,7 +183,12 @@ HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef *o);
 HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef *c, uint32_t lat);
 
 /* ---- NVIC / IRQ ---- */
-typedef enum { NonMaskableInt_IRQn = -14, EXTI0_IRQn = 6, USART2_IRQn = 38 } IRQn_Type;
+typedef enum {
+    NonMaskableInt_IRQn = -14,
+    EXTI0_IRQn = 6,
+    TIM4_IRQn  = 30,        /* 控制节拍定时器 */
+    USART2_IRQn = 38
+} IRQn_Type;
 void HAL_NVIC_SetPriority(IRQn_Type irq, uint32_t pre, uint32_t sub);
 void HAL_NVIC_EnableIRQ(IRQn_Type irq);
 
@@ -209,7 +219,9 @@ extern SCB_Type *SCB;
 #define __HAL_RCC_TIM1_CLK_ENABLE()  do { } while (0)
 #define __HAL_RCC_TIM2_CLK_ENABLE()  do { } while (0)
 #define __HAL_RCC_TIM3_CLK_ENABLE()  do { } while (0)
+#define __HAL_RCC_TIM4_CLK_ENABLE()  do { } while (0)
 #define __HAL_RCC_USART2_CLK_ENABLE() do { } while (0)
+#define __HAL_RCC_PWR_CLK_ENABLE()   do { } while (0)
 
 /* ---- 外设寄存器访问宏 ---- */
 #define __HAL_TIM_SET_COMPARE(h, ch, v)   do { (void)(h); (void)(ch); (void)(v); } while (0)
@@ -218,6 +230,10 @@ extern SCB_Type *SCB;
 
 #define __HAL_GPIO_EXTI_GET_IT(pin)   (0U)
 #define __HAL_GPIO_EXTI_CLEAR_IT(pin) do { (void)(pin); } while (0)
+
+#define __HAL_TIM_GET_FLAG(h, f)      (1U)
+#define __HAL_TIM_GET_IT_SOURCE(h, it) (1U)
+#define __HAL_TIM_CLEAR_IT(h, it)     do { (void)(h); (void)(it); } while (0)
 
 #define __HAL_UART_ENABLE_IT(h, it)  do { (void)(h); (void)(it); } while (0)
 #define UART_IT_RXNE 0x0020U
