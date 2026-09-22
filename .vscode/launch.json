@@ -1,0 +1,55 @@
+{
+    // 调试配置：arm-none-eabi-gdb + OpenOCD（ST-Link）
+    // 前提：
+    //   1. 已安装 Cortex-Debug 扩展（marus25.cortex-debug）
+    //   2. 已安装 OpenOCD，并加入 PATH
+    //   3. 先按 Ctrl+Shift+B 编译出 build/SmartCar.elf
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug (OpenOCD / ST-Link)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/SmartCar.elf",
+            "device": "STM32F103C8",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f1x.cfg"
+            ],
+            "svdFile": "${workspaceFolder}/docs/STM32F103.svd",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "preLaunchTask": "Build (make)"
+        },
+        {
+            "name": "Debug (OpenOCD / ST-Link) — F407VET6",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/SmartCar.elf",
+            "device": "STM32F407VE",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Build (F407VET6)"
+        },
+        {
+            "name": "Attach (不重新烧录)",
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/SmartCar.elf",
+            "device": "STM32F103C8",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f1x.cfg"
+            ]
+        }
+    ]
+}

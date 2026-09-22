@@ -1,0 +1,31 @@
+# ---- 构建产物 ----
+build/
+*.o
+*.d
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.su
+
+# ---- CubeMX / STM32 VS Code 扩展的中间产物 ----
+Debug/
+Release/
+*.launch
+.mxproject
+STM32CubeIDE/
+
+# ---- 编辑器 ----
+.vscode/settings.json.bak
+*.swp
+*~
+.idea/
+
+# ---- 注意 ----
+# 下面这些**必须提交**，不要加进忽略列表：
+#   *.ioc                      CubeMX 配置（引脚/时钟的唯一源头）
+#   各外设的 .c/.h             手写业务代码
+#   STM32F103C8Tx_FLASH.ld     链接脚本
+#   startup_*.s                启动文件
+#   stm32f1xx_hal_conf.h       HAL 配置
