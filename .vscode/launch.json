@@ -7,7 +7,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug (OpenOCD / ST-Link)",
+            "name": "Debug (legacy F103 / ST-Link)",
             "type": "cortex-debug",
             "request": "launch",
             "servertype": "openocd",
@@ -21,7 +21,7 @@
             "svdFile": "${workspaceFolder}/docs/STM32F103.svd",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none",
-            "preLaunchTask": "Build (make)"
+            "preLaunchTask": "Build (legacy F1)"
         },
         {
             "name": "Debug (OpenOCD / ST-Link) — F407VET6",
@@ -29,7 +29,7 @@
             "request": "launch",
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/SmartCar.elf",
+            "executable": "${workspaceFolder}/build/F4/SmartCar.elf",
             "device": "STM32F407VE",
             "configFiles": [
                 "interface/stlink.cfg",

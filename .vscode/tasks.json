@@ -14,7 +14,7 @@
                 "isDefault": true
             },
             "problemMatcher": ["$gcc"],
-            "detail": "编译整个工程（F103C8T6）"
+            "detail": "构建修订3 F407 停车最小固件"
         },
         {
             "label": "Build (F407VET6)",
@@ -23,7 +23,15 @@
             "args": ["-j8", "MCU_FAMILY=F4"],
             "group": "build",
             "problemMatcher": ["$gcc"],
-            "detail": "换成 F407VET6 后使用这个任务"
+            "detail": "显式构建 F407 最小目标"
+        },
+        {
+            "label": "Build (legacy F1)",
+            "type": "shell",
+            "command": "make",
+            "args": ["MCU_FAMILY=F1", "-j8"],
+            "problemMatcher": ["$gcc"],
+            "detail": "历史 F103，需自行补齐真实 F1 依赖"
         },
         {
             "label": "Clean",
@@ -64,7 +72,7 @@
             "command": "make",
             "args": ["size"],
             "problemMatcher": [],
-            "detail": "查看 Flash / RAM 占用。F103C8T6 只有 64KB Flash / 20KB RAM"
+            "detail": "查看 F407 最小固件 Flash / SRAM 占用"
         }
     ]
 }

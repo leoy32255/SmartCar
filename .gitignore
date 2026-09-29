@@ -8,6 +8,7 @@ build/
 *.map
 *.lst
 *.su
+__pycache__/
 
 # ---- CubeMX / STM32 VS Code 扩展的中间产物 ----
 Debug/

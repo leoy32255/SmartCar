@@ -11,9 +11,9 @@
 #        只做语法和类型检查，不产出任何目标文件。
 #
 #  用法：
-#    bash .ci_check/check.sh          # 检查两个平台
+#    bash .ci_check/check.sh          # 旧F1语法检查
 #    bash .ci_check/check.sh F1       # 只检查 F103
-#    bash .ci_check/check.sh F4       # 只检查 F407
+#    F407使用真实依赖：make MCU_FAMILY=F4 && make test
 #
 #  注意：stub 只覆盖本工程实际用到的 HAL 接口。
 #        如果新用了别的外设（如 ADC、DMA），需要往 stub 里补对应声明。
@@ -27,7 +27,7 @@ cd "$ROOT"
 CC=${CC:-gcc}
 WARN="-Wall -Wextra"
 INC="-I.ci_check -ICore/Inc"
-TARGETS="${1:-F1 F4}"
+TARGETS="${1:-F1}"
 
 fail=0
 
@@ -68,7 +68,7 @@ check_target() {
 for t in $TARGETS; do
     case "$t" in
         F1) check_target F1 STM32F103xB "STM32F103C8T6" ;;
-        F4) check_target F4 STM32F407xx "STM32F407VET6" ;;
+        F4) echo "F407 now uses real HAL/CMSIS: run make MCU_FAMILY=F4 and make test instead."; fail=1 ;;
         *)  echo "未知目标 '$t'，只支持 F1 / F4" ;;
     esac
 done

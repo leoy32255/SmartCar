@@ -23,6 +23,11 @@
 #ifndef __BSP_CONFIG_H__
 #define __BSP_CONFIG_H__
 
+#if defined(STM32F407xx)
+/* Current revision-3 board. Legacy application definitions below are F1-only. */
+#include "bsp_f407.h"
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -352,4 +357,5 @@ void Bsp_Init(void);
 }
 #endif
 
+#endif /* legacy F1 configuration */
 #endif /* __BSP_CONFIG_H__ */
