@@ -1,0 +1,34 @@
+{
+    // ---- 文件关联：让 .ioc 用 XML 高亮，方便直接看配置 ----
+    "files.associations": {
+        "*.ioc": "xml",
+        "*.ld": "ld",
+        "stm32f1xx_hal_conf.h": "c"
+    },
+
+    // ---- 编码：工程内所有源文件均为 UTF-8 ----
+    // 本工程注释是中文，如果这里不是 utf-8，
+    // 用 Keil/其他编辑器打开会变乱码。
+    "files.encoding": "utf8",
+
+    // ---- 排除干扰目录，加快搜索 ----
+    "files.exclude": {
+        "build": true,
+        "**/*.o": true,
+        "**/*.d": true
+    },
+    "search.exclude": {
+        "build": true,
+        "Drivers": true
+    },
+
+    // ---- 用 4 空格缩进，与 CubeMX 生成的代码风格一致 ----
+    "[c]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+
+    // ---- 关闭 STM32 HAL 库里大量的宏展开提示 ----
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.intelliSenseEngineFallback": "disabled"
+}

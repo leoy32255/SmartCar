@@ -1,0 +1,10 @@
+arm-none-eabi-gcc build/F4/main.o build/F4/bsp.o build/F4/interrupts.o build/F4/system_stm32f4xx.o build/F4/stm32f4xx_hal.o build/F4/stm32f4xx_hal_cortex.o build/F4/stm32f4xx_hal_rcc.o build/F4/stm32f4xx_hal_rcc_ex.o build/F4/stm32f4xx_hal_pwr.o build/F4/stm32f4xx_hal_pwr_ex.o build/F4/stm32f4xx_hal_flash.o build/F4/stm32f4xx_hal_flash_ex.o build/F4/stm32f4xx_hal_gpio.o build/F4/stm32f4xx_hal_tim.o build/F4/stm32f4xx_hal_tim_ex.o build/F4/stm32f4xx_hal_uart.o build/F4/stm32f4xx_hal_spi.o build/F4/stm32f4xx_hal_dma.o build/F4/startup_stm32f407xx.o -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -nostartfiles --specs=nano.specs --specs=nosys.specs -TSTM32F407VETx_FLASH.ld -Wl,-Map=build/F4/SmartCar.map,--cref,--gc-sections,--print-memory-usage -Wl,--start-group -lc -lm -lnosys -Wl,--end-group -o build/F4/SmartCar.elf
+Memory region         Used Size  Region Size  %age Used
+           FLASH:        7172 B       512 KB      1.37%
+             RAM:        2528 B       128 KB      1.93%
+             CCM:           0 B        64 KB      0.00%
+arm-none-eabi-size build/F4/SmartCar.elf
+   text	   data	    bss	    dec	    hex	filename
+   7160	     12	   2516	   9688	   25d8	build/F4/SmartCar.elf
+arm-none-eabi-objcopy -O ihex build/F4/SmartCar.elf build/F4/SmartCar.hex
+arm-none-eabi-objcopy -O binary build/F4/SmartCar.elf build/F4/SmartCar.bin

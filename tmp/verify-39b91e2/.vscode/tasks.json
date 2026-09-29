@@ -1,0 +1,78 @@
+{
+    // VS Code 构建/烧录任务
+    // 依赖：arm-none-eabi-gcc 已在 PATH 中
+    // 用法：Ctrl+Shift+B 直接编译
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build (make)",
+            "type": "shell",
+            "command": "make",
+            "args": ["-j8"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "构建修订3 F407 停车最小固件"
+        },
+        {
+            "label": "Build (F407VET6)",
+            "type": "shell",
+            "command": "make",
+            "args": ["-j8", "MCU_FAMILY=F4"],
+            "group": "build",
+            "problemMatcher": ["$gcc"],
+            "detail": "显式构建 F407 最小目标"
+        },
+        {
+            "label": "Build (legacy F1)",
+            "type": "shell",
+            "command": "make",
+            "args": ["MCU_FAMILY=F1", "-j8"],
+            "problemMatcher": ["$gcc"],
+            "detail": "历史 F103，需自行补齐真实 F1 依赖"
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make",
+            "args": ["clean"],
+            "problemMatcher": [],
+            "detail": "删除 build/ 目录"
+        },
+        {
+            "label": "Rebuild",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Clean", "Build (make)"],
+            "problemMatcher": [],
+            "detail": "先清理再完整编译"
+        },
+        {
+            "label": "Flash (STM32CubeProgrammer)",
+            "type": "shell",
+            "command": "make",
+            "args": ["flash"],
+            "problemMatcher": [],
+            "dependsOn": ["Build (make)"],
+            "detail": "用 ST-Link 烧录到 0x08000000"
+        },
+        {
+            "label": "Flash (OpenOCD)",
+            "type": "shell",
+            "command": "make",
+            "args": ["flash-ocd"],
+            "problemMatcher": [],
+            "dependsOn": ["Build (make)"],
+            "detail": "用 OpenOCD 烧录"
+        },
+        {
+            "label": "Show sizes",
+            "type": "shell",
+            "command": "make",
+            "args": ["size"],
+            "problemMatcher": [],
+            "detail": "查看 F407 最小固件 Flash / SRAM 占用"
+        }
+    ]
+}
