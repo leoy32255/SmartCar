@@ -17,7 +17,7 @@ DEVICE_DIR := Drivers/CMSIS/Device/ST/STM32F4xx
 LDSCRIPT := STM32F407VETx_FLASH.ld
 STARTUP := Core/Startup/startup_stm32f407xx.s
 HAL_MODULES := hal hal_cortex hal_rcc hal_rcc_ex hal_pwr hal_pwr_ex hal_flash hal_flash_ex hal_gpio hal_tim hal_tim_ex hal_uart hal_spi hal_dma
-C_SOURCES := Core/F407/main.c Core/F407/bsp.c Core/F407/interrupts.c \
+C_SOURCES := Core/F407/main.c Core/F407/bsp.c Core/F407/motor.c Core/F407/interrupts.c \
  $(DEVICE_DIR)/Source/Templates/system_stm32f4xx.c \
  $(addprefix $(HAL_DIR)/Src/stm32f4xx_,$(addsuffix .c,$(HAL_MODULES)))
 CPU := -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard

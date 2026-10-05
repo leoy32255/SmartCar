@@ -12,6 +12,10 @@
 #ifndef __MOTOR_H__
 #define __MOTOR_H__
 
+#if defined(STM32F407xx)
+#include "motor_f407.h"
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,4 +72,5 @@ void Motor_GetPWM(int16_t *left, int16_t *right);
 }
 #endif
 
+#endif /* legacy F1 driver */
 #endif /* __MOTOR_H__ */

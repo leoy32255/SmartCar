@@ -7,7 +7,7 @@
 #else
 #include <sys/mman.h>
 #endif
-#include <assert.h>
+#include "host_assert.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,8 +30,21 @@ static unsigned port_index(GPIO_TypeDef *port)
 
 void HAL_GPIO_WritePin(GPIO_TypeDef *port, uint16_t mask, GPIO_PinState state)
 {
+#ifdef TEST_MOTOR
+    if (port == GPIOE && (mask & 0x3500U) && state == GPIO_PIN_RESET) {
+        /* No new driving direction may be selected with old PWM still queued. */
+        assert(TIM1->CCR1 == 0 && TIM1->CCR2 == 0);
+        assert(TIM1->EGR == TIM_EGR_UG);
+    }
+#endif
     if (state == GPIO_PIN_SET) port->ODR |= mask;
     else port->ODR &= ~mask;
+#ifdef TEST_MOTOR
+    if (port == GPIOE && (mask & 0x3500U)) {
+        assert((port->ODR & 0x0500U) != 0); /* Never request left 00 brake. */
+        assert((port->ODR & 0x3000U) != 0);
+    }
+#endif
 }
 
 void HAL_GPIO_Init(GPIO_TypeDef *port, GPIO_InitTypeDef *init)
@@ -181,5 +194,9 @@ int main(void)
     assert(TIM1->CCR1 == 0 && TIM1->CCR2 == 0);
     assert((GPIOE->ODR & 0x3500U) == 0x3500U);
     puts("BSP host boundary checks passed (no hardware execution)");
+#ifdef TEST_MOTOR
+    extern void test_motor(void);
+    test_motor();
+#endif
     return 0;
 }

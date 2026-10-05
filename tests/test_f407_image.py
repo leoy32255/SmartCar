@@ -46,9 +46,13 @@ class FirmwareImage(unittest.TestCase):
                          self.symbols["Default_Handler"][0])
 
     def test_real_runtime_and_no_legacy_application(self):
-        for name in ("SystemInit", "HAL_Init", "HAL_IncTick", "Bsp_Init", "main"):
+        for name in ("SystemInit", "HAL_Init", "HAL_IncTick", "Bsp_Init", "main",
+                     "Motor_Init", "Motor_Stop"):
             self.assertIn(name, self.symbols)
-        for name in ("App_Init", "Motor_SetPWM", "HAL_PWREx_EnableOverDrive"):
+        # The diagnostic main has no enable/drive caller; gc-sections removes
+        # those functions from ELF, but motor.o is still compiled by ARM GCC.
+        for name in ("App_Init", "Motor_SetPWM", "Motor_Enable", "Motor_Standby",
+                     "HAL_PWREx_EnableOverDrive"):
             self.assertNotIn(name, self.symbols)
         self.assertGreater((BUILD / "SmartCar.hex").stat().st_size, 0)
         self.assertGreater((BUILD / "SmartCar.map").stat().st_size, 0)

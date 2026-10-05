@@ -21,7 +21,10 @@ class BoardInitialization(unittest.TestCase):
         command += [str(ROOT / "Core/F407/bsp.c"), str(ROOT / "tests/bsp_harness.c"),
                     "-o", str(executable)]
         subprocess.run(command, check=True)
-        subprocess.run([str(executable)], check=True)
+        result = subprocess.run([str(executable)], capture_output=True,
+                                text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("BSP host boundary checks passed", result.stdout)
 
 
 if __name__ == "__main__":

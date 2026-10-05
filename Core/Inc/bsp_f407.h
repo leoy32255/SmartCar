@@ -17,8 +17,23 @@
 #define BSP_UART_BAUD                9600U
 
 #define BSP_MOTOR_PORT GPIOE
-#define BSP_MOTOR_DIRECTIONS (GPIO_PIN_8 | GPIO_PIN_10 | GPIO_PIN_12 | GPIO_PIN_13)
+#define BSP_MOTOR_LEFT_IN1 GPIO_PIN_10
+#define BSP_MOTOR_LEFT_IN2 GPIO_PIN_8
+#define BSP_MOTOR_RIGHT_IN1 GPIO_PIN_12
+#define BSP_MOTOR_RIGHT_IN2 GPIO_PIN_13
+#define BSP_MOTOR_DIRECTIONS (BSP_MOTOR_LEFT_IN1 | BSP_MOTOR_LEFT_IN2 | \
+                              BSP_MOTOR_RIGHT_IN1 | BSP_MOTOR_RIGHT_IN2)
 #define BSP_MOTOR_PWM_PINS (GPIO_PIN_9 | GPIO_PIN_11)
+#define BSP_MOTOR_PWM_TIMER TIM1
+#define BSP_MOTOR_MIN_PERMILLE 50
+#define BSP_MOTOR_MAX_PERMILLE 950
+/* Software convention only; verify forward wheel direction on the bench. */
+#ifndef BSP_MOTOR_LEFT_INVERT
+#define BSP_MOTOR_LEFT_INVERT 0
+#endif
+#ifndef BSP_MOTOR_RIGHT_INVERT
+#define BSP_MOTOR_RIGHT_INVERT 0
+#endif
 #define BSP_ENCODER_LEFT_PORT GPIOC
 #define BSP_ENCODER_LEFT_PINS (GPIO_PIN_6 | GPIO_PIN_7)
 #define BSP_ENCODER_RIGHT_PORT GPIOD
@@ -46,6 +61,8 @@ extern volatile uint32_t bsp_uart_errors;
 
 void Bsp_Init(void);
 void Bsp_Clock_Config(void);
+/* Low-level initialization/driver helper, requires TIM1 clock and PWM setup.
+ * Application stops must use Motor_Stop so the software enable is revoked. */
 void Bsp_MotorStop(void);
 void Error_Handler(void);
 

@@ -177,8 +177,12 @@ void Bsp_MotorStop(void)
 {
     /* Direction 11 is coast on this board, unlike legacy TB6612 semantics. */
     HAL_GPIO_WritePin(BSP_MOTOR_PORT, BSP_MOTOR_DIRECTIONS, GPIO_PIN_SET);
-    TIM1->CCR1 = 0;
-    TIM1->CCR2 = 0;
+    BSP_MOTOR_PWM_TIMER->CCR1 = 0;
+    BSP_MOTOR_PWM_TIMER->CCR2 = 0;
+    /* HAL enables OC preload. Flush BOTH zero compares while bridges are 11:
+     * otherwise an old active duty could drive the new direction for a cycle.
+     * No TIM1 update IRQ/DMA is enabled. New duty latches at the next wrap. */
+    BSP_MOTOR_PWM_TIMER->EGR = TIM_EGR_UG;
 }
 
 void Bsp_Init(void)
