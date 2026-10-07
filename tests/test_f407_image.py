@@ -49,13 +49,15 @@ class FirmwareImage(unittest.TestCase):
         for name in ("SystemInit", "HAL_Init", "HAL_IncTick", "Bsp_Init", "main",
                      "Motor_Init", "Motor_Stop"):
             self.assertIn(name, self.symbols)
-        # The diagnostic main has no enable/drive caller; gc-sections removes
-        # those functions from ELF, but motor.o is still compiled by ARM GCC.
-        for name in ("App_Init", "Motor_SetPWM", "Motor_Enable", "Motor_Standby",
+        for name in ("Motor_SetPWM", "Motor_Enable", "Runtime_Byte", "Control_Tick"):
+            self.assertIn(name,self.symbols)
+        for name in ("Motor_Standby",
                      "HAL_PWREx_EnableOverDrive"):
             self.assertNotIn(name, self.symbols)
         self.assertGreater((BUILD / "SmartCar.hex").stat().st_size, 0)
         self.assertGreater((BUILD / "SmartCar.map").stat().st_size, 0)
+        self.assertNotIn("Core/Src/", (BUILD / "SmartCar.map").read_text())
+        self.assertIn("App_Step", self.symbols)
         # Every Intel HEX record must have a correct checksum.
         lines = (BUILD / "SmartCar.hex").read_text().splitlines()
         for line in lines:
@@ -65,6 +67,12 @@ class FirmwareImage(unittest.TestCase):
             self.assertEqual(sum(record) & 255, 0)
         self.assertEqual(lines[-1], ":00000001FF")
 
+    def test_diagnostic_has_no_motor_drive(self):
+        listing=subprocess.check_output([PREFIX+"nm",str(ROOT/"build/F4-diagnostic/SmartCar.elf")],text=True)
+        names={line.split()[-1] for line in listing.splitlines() if line.split()}
+        self.assertIn("Motor_Stop",names)
+        self.assertNotIn("Motor_Enable",names)
+        self.assertNotIn("Motor_SetPWM",names)
 
 if __name__ == "__main__":
     unittest.main()

@@ -198,5 +198,9 @@ int main(void)
     extern void test_motor(void);
     test_motor();
 #endif
+#ifdef TEST_APP
+    extern void test_app(void);
+    test_app();
+#endif
     return 0;
 }

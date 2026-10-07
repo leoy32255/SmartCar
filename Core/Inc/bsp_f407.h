@@ -2,6 +2,7 @@
 #define BSP_F407_H
 
 #include "stm32f4xx_hal.h"
+#include "app_config_f407.h"
 
 /* XY-160D revision 3. PA0/PA1, USB, SWD and oscillator pins are reserved. */
 #define BSP_SYSCLK_HZ          168000000U

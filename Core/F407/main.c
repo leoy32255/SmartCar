@@ -1,5 +1,9 @@
 #include "bsp_config.h"
 #include "motor.h"
+#include "sensor_port_f407.h"
+#include "runtime_f407.h"
+#include "uart_f407.h"
+#include "app_f407.h"
 
 /* ST Reset_Handler initializes data/bss and calls newlib's constructor runner.
  * No generic CRT startup (and no semihosting/syscall runtime) is needed. */
@@ -9,9 +13,8 @@ int main(void)
 {
     if (HAL_Init() != HAL_OK) Error_Handler();
     Bsp_Init();
-    Motor_Init();
-    /* Bring-up only: no legacy App_Init, autostart, or motion command path. */
-    for (;;) __WFI();
+    App_Init();
+    for (;;) {App_Step();__WFI();}
 }
 
 void Error_Handler(void)

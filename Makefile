@@ -5,7 +5,8 @@ include make/legacy-f1.mk
 else ifeq ($(MCU_FAMILY),F4)
 .DEFAULT_GOAL := all
 TARGET := SmartCar
-BUILD_DIR := build/F4
+DIAGNOSTIC ?= 0
+BUILD_DIR := $(if $(filter 1,$(DIAGNOSTIC)),build/F4-diagnostic,build/F4)
 CROSS_COMPILE ?= arm-none-eabi-
 export CROSS_COMPILE
 PYTHON ?= python
@@ -17,11 +18,11 @@ DEVICE_DIR := Drivers/CMSIS/Device/ST/STM32F4xx
 LDSCRIPT := STM32F407VETx_FLASH.ld
 STARTUP := Core/Startup/startup_stm32f407xx.s
 HAL_MODULES := hal hal_cortex hal_rcc hal_rcc_ex hal_pwr hal_pwr_ex hal_flash hal_flash_ex hal_gpio hal_tim hal_tim_ex hal_uart hal_spi hal_dma
-C_SOURCES := Core/F407/main.c Core/F407/bsp.c Core/F407/motor.c Core/F407/interrupts.c \
+C_SOURCES := Core/F407/main.c Core/F407/app.c Core/F407/bsp.c Core/F407/motor.c Core/F407/sensors.c Core/F407/sensor_port.c Core/F407/control.c Core/F407/runtime.c Core/F407/uart.c Core/F407/interrupts.c \
  $(DEVICE_DIR)/Source/Templates/system_stm32f4xx.c \
  $(addprefix $(HAL_DIR)/Src/stm32f4xx_,$(addsuffix .c,$(HAL_MODULES)))
 CPU := -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
-CPPFLAGS := -DSTM32F407xx -DUSE_HAL_DRIVER -DUSER_VECT_TAB_ADDRESS -ICore/Inc \
+CPPFLAGS := -DAPP_DIAGNOSTIC=$(DIAGNOSTIC) -DSTM32F407xx -DUSE_HAL_DRIVER -DUSER_VECT_TAB_ADDRESS -ICore/Inc \
  -I$(HAL_DIR)/Inc -I$(HAL_DIR)/Inc/Legacy -I$(DEVICE_DIR)/Include -IDrivers/CMSIS/Include
 CFLAGS := $(CPU) -std=c11 -Os -g3 -Wall -Wextra -Werror -ffunction-sections -fdata-sections -MMD -MP
 LDFLAGS := $(CPU) -nostartfiles --specs=nano.specs --specs=nosys.specs -T$(LDSCRIPT) \
@@ -57,6 +58,8 @@ size: $(BUILD_DIR)/$(TARGET).elf
 	$(SIZE) $<
 
 test: all
+	$(MAKE) DIAGNOSTIC=1 all
+	$(PYTHON) tools/build_simulator.py
 	$(PYTHON) -m unittest discover -s tests -v
 
 clean:

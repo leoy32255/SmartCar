@@ -1,18 +1,25 @@
-# SmartCar —— STM32F407VET6 修订3板级最小固件
+# SmartCar — STM32F407VET6 修订3课堂软件
 
-当前默认构建是与修订3接线一致的F407最小目标，真实HAL/CMSIS、启动文件与链接脚本已纳入仓库。固件保持方向11、PWM0，不运行旧运动控制，也不解析运动指令。
-
-已增加独立 XY-160D 驱动：带符号千分比、5%–95%限幅、方向校准、换向清除旧PWM、默认禁用与显式停机。当前诊断主程序仅初始化驱动，不调用使能或运动接口；TIM6 5ms节拍与TIM3/TIM4编码器保持独立。接口、主机测试及本轮交叉编译结果见 [F407电机驱动迁移](docs/F407电机驱动迁移.md)。
+当前F407工程包含XY-160D、TIM3/TIM4编码器、SPI2 MPU6500/MCP23S17、USART2协议、500ms控制心跳、故障锁存、速度/循迹控制，以及Windows本机面板与同源C模拟器。上电保持停车，运动必须人工启动。没有推送、烧录或电机运行。
 
 ```sh
-make -j8        # build/F4/SmartCar.elf、.hex、.bin、.map
-make test      # 产物、主机板级边界、依赖哈希验证
-make size
+make -j8                  # 运动入口，build/F4/SmartCar.{elf,hex,bin,map}
+make DIAGNOSTIC=1 -j8     # 纯停车诊断入口，build/F4-diagnostic/
+make test                # 双目标、同源模拟器、全部主机/产物/依赖测试
+python -m panel.server   # http://127.0.0.1:8765，默认SIM；需先make test或构建模拟器
 ```
 
-需要ARM交叉编译工具链、GNU Make和Python；主机测试另需本机GCC。完整设置、时钟/中断归属、验证边界和ROM DFU说明见 **[F407最小构建](docs/F407最小构建.md)**；当前引脚见 **[引脚分配](docs/引脚分配.md)**；官方依赖见 **[Drivers](Drivers/README.md)**。
+需要ARM GCC、GNU Make、Python和主机GCC。具体本机路径见[F407最小构建](docs/F407最小构建.md)。控制端真实COM需要`python -m pip install -r panel/requirements.txt`。禁止将历史F103接线、协议或调参值直接用于当前版本。
 
-`Core/F407` 是当前实现；旧 `Core/Src` 应用未编入F407。完整控制、MCP23S17/MPU6500驱动、心跳失联停车及上位机仍待后续实现。F1由 `make MCU_FAMILY=F1` 保留旧构建入口，但未提供真实F1依赖，不宣称F1可构建。未烧录、未上电验证。
+- [协议、控制与传感器边界](docs/F407协议与控制.md)
+- [Windows面板使用与模拟](docs/Windows控制面板.md)
+- [课堂135分钟检查表与ROM DFU](docs/课堂135分钟检查表.md)
+- [软件交付验证与需求追踪](docs/软件交付验证.md)
+- [修订3引脚](docs/引脚分配.md)与[电机驱动细节](docs/F407电机驱动迁移.md)
+
+源码分层：app负责真实调度与故障传播，control负责运动状态/控制，runtime负责帧/命令/遥测，uart负责ISR队列，sensors负责器件和采样逻辑，sensor_port负责HAL SPI事务，motor/bsp负责实际输出与板级资源。HAL/CMSIS保持固定官方依赖；旧Core/Src不编入F407。
+
+首次丢线或线路歧义停车；不声称已完成十字/T字识别、搜线或航向辅助。软件模拟不证明电气时序、机械停车、蓝牙、台架或赛道表现。Windows实际UI验收状态见交付记录，不能由协议自动测试替代。
 
 ## 历史F103初版说明（以下不作为当前F407接线或验收依据）
 

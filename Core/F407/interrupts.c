@@ -1,4 +1,5 @@
 #include "bsp_config.h"
+#include "uart_f407.h"
 
 volatile uint32_t bsp_control_ticks;
 volatile uint32_t bsp_imu_edges;
@@ -33,11 +34,12 @@ void USART2_IRQHandler(void)
     /* SR then DR clears RXNE/ORE/NE/FE/PE on STM32F407. */
     uint32_t status = USART2->SR;
     if (status & (USART_SR_RXNE | USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE)) {
-        volatile uint32_t discarded = USART2->DR;
-        (void)discarded;
+        uint8_t byte=(uint8_t)USART2->DR;
+        Uart_ReceiveISR(byte,HAL_GetTick(),(status & (USART_SR_ORE|USART_SR_NE|USART_SR_FE|USART_SR_PE))!=0);
         if (status & USART_SR_RXNE) ++bsp_uart_rx_bytes;
         if (status & (USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE)) ++bsp_uart_errors;
     }
+    if((status & USART_SR_TXE) && (USART2->CR1 & USART_CR1_TXEIE)) Uart_TransmitISR();
 }
 
 void NMI_Handler(void) { Error_Handler(); }
