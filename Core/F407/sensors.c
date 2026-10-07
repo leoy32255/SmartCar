@@ -118,9 +118,9 @@ void Encoder_InitTimed(Encoder *e,uint16_t l,uint16_t r,bool il,bool ir,uint32_t
 }
 bool Encoder_Poll(Encoder *e,uint16_t l,uint16_t r,uint32_t now) {
     uint32_t elapsed=now-e->last_ms;
-    if(elapsed<10U) return false;
-    Encoder_Sample(e,l,r);e->last_ms=now;e->window_ms=elapsed;e->valid=elapsed<=20U;
-    if(e->valid) {e->left=e->left*10/(int32_t)elapsed;e->right=e->right*10/(int32_t)elapsed;}
+    if(elapsed<APP_ENCODER_MIN_SAMPLE_MS) return false;
+    Encoder_Sample(e,l,r);e->last_ms=now;e->window_ms=elapsed;e->valid=elapsed<=APP_ENCODER_MAX_SAMPLE_MS;
+    if(e->valid) {e->left=e->left*(int32_t)APP_SPEED_UNIT_MS/(int32_t)elapsed;e->right=e->right*(int32_t)APP_SPEED_UNIT_MS/(int32_t)elapsed;}
     else e->left=e->right=0;
     return true;
 }

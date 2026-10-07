@@ -50,7 +50,7 @@ void Control_Tick(Control *c,uint32_t now) {
     Control_CheckTime(c,now);
     if(c->mode==MODE_STOP) { c->last_tick=now; return; }
     if(!c->sensors_valid || now-c->sensor_ms>APP_SENSOR_MAX_AGE_MS) { Control_Fault(c,FAULT_SENSOR); return; }
-    if(now-c->last_tick>APP_SENSOR_MAX_AGE_MS) { Control_Fault(c,FAULT_SCHEDULE); return; }
+    if(now-c->last_tick>APP_CONTROL_MAX_GAP_MS) { Control_Fault(c,FAULT_SCHEDULE); return; }
     if(c->mode==MODE_TRACK) {
         if(!c->mask) { Control_Fault(c,FAULT_LINE); return; }
         /* Only a narrow contiguous 1/2-channel line is classified. Wider or
@@ -58,7 +58,7 @@ void Control_Tick(Control *c,uint32_t now) {
         uint8_t m=c->mask;
         while(!(m&1U)) m>>=1;
         if(m!=1 && m!=3) { Control_Fault(c,FAULT_AMBIGUOUS); return; }
-        if(now-c->last_tick<10U) return;
+        if(now-c->last_tick<APP_SPEED_CONTROL_MS) return;
         int32_t turn=(c->param[1]*c->deviation+c->param[2]*(c->deviation-c->previous_deviation))/100;
         c->previous_deviation=c->deviation;
         int32_t base=c->param[0];
@@ -66,7 +66,7 @@ void Control_Tick(Control *c,uint32_t now) {
         c->target[0]=(int16_t)clip(base+turn,0,20);
         c->target[1]=(int16_t)clip(base-turn,0,20);
     }
-    if(now-c->last_tick<10U) return;
+    if(now-c->last_tick<APP_SPEED_CONTROL_MS) return;
     c->last_tick=now;
     for(unsigned i=0;i<2;i++) {
         int32_t error=c->target[i]-c->speed[i];

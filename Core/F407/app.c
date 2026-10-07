@@ -34,7 +34,7 @@ void App_Step(void) {
     if(runtime.control.mode==MODE_STOP) Motor_Stop();
     uint32_t current_ticks=bsp_control_ticks;
     if(current_ticks!=ticks) {
-        if(current_ticks-ticks>4U && runtime.control.mode!=MODE_STOP)
+        if(current_ticks-ticks>APP_CONTROL_MAX_GAP_MS/BSP_CTRL_PERIOD_MS && runtime.control.mode!=MODE_STOP)
             Control_Fault(&runtime.control,FAULT_SCHEDULE);
         ticks=current_ticks;now=HAL_GetTick();
         TrackSample track;
@@ -63,7 +63,7 @@ void App_Step(void) {
         sample_ms=now;
     }
     now=HAL_GetTick();
-    if(now-sample_ms>20U && runtime.control.mode!=MODE_STOP) Control_Fault(&runtime.control,FAULT_SCHEDULE);
+    if(now-sample_ms>APP_SENSOR_MAX_AGE_MS && runtime.control.mode!=MODE_STOP) Control_Fault(&runtime.control,FAULT_SCHEDULE);
     if(Uart_TakeError()) {Control_Fault(&runtime.control,FAULT_UART);runtime.used=0;}
     Control_Tick(&runtime.control,now);
     if((previous_mode!=MODE_STOP && runtime.control.mode==MODE_STOP) || previous_fault!=runtime.control.fault)

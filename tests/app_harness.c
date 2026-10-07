@@ -57,6 +57,8 @@ void test_app(void) {
         step(1);stopped();step(9);command(6,0,0);command(7,0,0);stopped();step(5);
     }
     command(6,0,0);mode=2;command(1,&mode,1);command(2,drive,4);step(10);
+    assert(TIM1->CCR1>0);step(30);stopped();assert(App_Status()->control.fault&FAULT_SENSOR);
+    step(10);command(6,0,0);command(7,0,0);step(5);mode=2;command(1,&mode,1);command(2,drive,4);step(10);
     assert(TIM1->CCR1>0);uint8_t pad=0;while(Uart_Send(0,&pad,1)) {}
     uint32_t dropped=App_Status()->dropped_tx;mode=0;command(1,&mode,1);
     stopped();assert(App_Status()->dropped_tx>dropped);

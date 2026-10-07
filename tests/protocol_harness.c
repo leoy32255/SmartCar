@@ -43,6 +43,13 @@ int main(void) {
     for(unsigned i=3;i<sn;i++) Runtime_Byte(&r,start[i],9,11);
     assert(r.control.mode==MODE_STOP);
     Runtime_BeginBatch(&r,12);command(&r,1,&mode,1,12);assert(r.control.mode==MODE_TRACK);
+    Control_Fault(&r.control,FAULT_UART);Control_Sensors(&r.control,4,0,0,0,true,13);
+    command(&r,7,0,0,13);
+    for(unsigned i=0;i<3;i++) Runtime_Byte(&r,start[i],12,13);
+    Runtime_BeginBatch(&r,14);
+    for(unsigned i=3;i<sn;i++) Runtime_Byte(&r,start[i],12,14);
+    assert(r.control.mode==MODE_STOP);
+    Runtime_BeginBatch(&r,15);command(&r,1,&mode,1,15);assert(r.control.mode==MODE_TRACK);
     assert(emitted>0);
     return 0;
 }
