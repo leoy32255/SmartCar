@@ -1,0 +1,54 @@
+{
+  "time": "2026-10-07T14:41:10.843Z",
+  "connected": true,
+  "port": "SIM",
+  "status": {
+    "version": 1,
+    "mode": 0,
+    "fault": 0,
+    "mask": 4,
+    "health": 7,
+    "deviation": 0,
+    "speed": [
+      0,
+      0
+    ],
+    "pwm": [
+      0,
+      0
+    ],
+    "accel": [
+      0,
+      0,
+      16384
+    ],
+    "gyro_raw": [
+      0,
+      0,
+      0
+    ],
+    "bias": [
+      0,
+      0,
+      0
+    ],
+    "device_ms": 108500,
+    "bad_frames": 0,
+    "dropped_tx": 0
+  },
+  "params": [
+    4,
+    20,
+    5,
+    20,
+    2,
+    0
+  ],
+  "ack": {
+    "command": 1,
+    "ok": true
+  },
+  "error": "",
+  "log": "D:\\Repository\\SmartCar\\logs\\20261007-223922-288342.jsonl",
+  "stale": false
+}
