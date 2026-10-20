@@ -30,4 +30,4 @@
 |---|---|---|
 | 清理两种 F407 构建输出 | `python tools/clean_f407.py`（或 `make clean`） | Python；删除 `build/F4/` 与 `build/F4-diagnostic/`，拒绝重定向目录。 |
 | 恢复固定版本的官方依赖 | `python tools/vendor_f407.py <HAL checkout> <device checkout> <CMSIS_5 checkout>` | Python、Git及三个干净的上游检出目录；校验脚本内固定提交后，写入 `Drivers/`、`Core/Startup/startup_stm32f407xx.s` 和 `Drivers/manifest.json`。仅在明确恢复或更新依赖时运行。 |
-| 完整软件验证 | `make test` | ARM GCC、GNU Make、Python、主机 GCC；构建双固件目标与模拟器，运行主机、产物和依赖测试。具体配置见 `docs/F407最小构建.md`；不触发烧录。 |
+| 完整软件验证 | `make test` | ARM GCC、GNU Make、Python、主机 GCC；构建双固件目标与模拟器，运行主机、产物和依赖测试。具体配置见 `docs/上手与实物联调流程.md`；不触发烧录。 |

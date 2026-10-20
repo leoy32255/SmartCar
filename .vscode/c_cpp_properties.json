@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "STM32F103C8T6",
-            "compilerPath": "arm-none-eabi-gcc",
+            "compilerPath": "${env:USERPROFILE}/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",
@@ -31,7 +31,7 @@
         },
         {
             "name": "STM32F407VET6",
-            "compilerPath": "arm-none-eabi-gcc",
+            "compilerPath": "${env:USERPROFILE}/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",

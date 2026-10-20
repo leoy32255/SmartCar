@@ -1,0 +1,72 @@
+[
+  {
+    "source": "docs/CubeMX配置说明.md",
+    "archive": "docs/archive/2026-10-20/CubeMX配置说明.md",
+    "original_sha256": "cf634018c1efb4c372f8749116dd4bc6379e3e978fc883e89d1b2d077ec9a823"
+  },
+  {
+    "source": "docs/F407协议与控制.md",
+    "archive": "docs/archive/2026-10-20/F407协议与控制.md",
+    "original_sha256": "3718f25e0b039ca95364286d2852e5d281b484418ce1477e4b518b549470c54a"
+  },
+  {
+    "source": "docs/F407最小构建.md",
+    "archive": "docs/archive/2026-10-20/F407最小构建.md",
+    "original_sha256": "7416ab9650106adff5b8f81006bcd72d13b72fae7e94519e3efef51a7710d633"
+  },
+  {
+    "source": "docs/F407构建验证.md",
+    "archive": "docs/archive/2026-10-20/F407构建验证.md",
+    "original_sha256": "cd4a9a291c096ec7ba2850f68e22cd00072879425996d7cfcd08ff261a7a6725"
+  },
+  {
+    "source": "docs/F407电机驱动迁移.md",
+    "archive": "docs/archive/2026-10-20/F407电机驱动迁移.md",
+    "original_sha256": "c82b88a4f2edbe528adf2b580e8bd8640eecc583642658b185439d5450ffa769"
+  },
+  {
+    "source": "docs/Windows控制面板.md",
+    "archive": "docs/archive/2026-10-20/Windows控制面板.md",
+    "original_sha256": "7a370fa6ebf292c706a9b7f5b375d11f6cf6ef38c8db1f5c6887c77f56d9f193"
+  },
+  {
+    "source": "docs/引脚分配.md",
+    "archive": "docs/archive/2026-10-20/引脚分配.md",
+    "original_sha256": "f76160af1caba08c30e4a2b13d41d1365017bb2899aa8a5661e90ce0ac2d1981"
+  },
+  {
+    "source": "docs/心跳取消差异诊断.md",
+    "archive": "docs/archive/2026-10-20/心跳取消差异诊断.md",
+    "original_sha256": "12c5103f580d37d768f4d8e01387cbb655a8940c6a6b274116251214a4206d03"
+  },
+  {
+    "source": "docs/移植到F407VET6.md",
+    "archive": "docs/archive/2026-10-20/移植到F407VET6.md",
+    "original_sha256": "f097d1c1e1fac23377149748aedb1d6c450d5e4f3136b87bb6376541d55ee20e"
+  },
+  {
+    "source": "docs/课堂135分钟检查表.md",
+    "archive": "docs/archive/2026-10-20/课堂135分钟检查表.md",
+    "original_sha256": "bda431edd6cc84a902ed355315298f2b594ef4e33feaf5fc9d3f99a7a9bf7200"
+  },
+  {
+    "source": "docs/软件交付工作安排.md",
+    "archive": "docs/archive/2026-10-20/软件交付工作安排.md",
+    "original_sha256": "281db2c30a1e6875a07c108faa716d5d8df9c26e24f160b7b01925154f1b3548"
+  },
+  {
+    "source": "docs/软件交付验证.md",
+    "archive": "docs/archive/2026-10-20/软件交付验证.md",
+    "original_sha256": "63fe5d426431aa0b52c5cc348a51ec9ef524eefca8ebbf9dc61b57110bd2f10e"
+  },
+  {
+    "source": "docs/软件验收覆盖审计.md",
+    "archive": "docs/archive/2026-10-20/软件验收覆盖审计.md",
+    "original_sha256": "f1d07b81eda51aa199e5abe4b41ad415447634c95392d8e5e587ce8f19ab37dc"
+  },
+  {
+    "source": "README.md",
+    "archive": "docs/archive/2026-10-20/根目录README.md",
+    "original_sha256": "aadfc8bae03710c63ac92c8b96c436496c7cdd9a0390a47cf2f03f49122c6b34"
+  }
+]
