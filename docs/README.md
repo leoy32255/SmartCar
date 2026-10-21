@@ -7,7 +7,7 @@
 | 准备线材、焊排针、配置电脑、首次接板与联调 | [统一流程](上手与实物联调流程.md) |
 | 开发时快速核对F407信号与资源 | [引脚分配](引脚分配.md) |
 | 开发协议、理解控制/传感器边界 | [F407协议与控制](F407协议与控制.md) |
-| 查看接线设计原图和历史参数附件 | [修订3单页接线图](reference/智能三轮循迹小车_逐引脚接线图_修订3.pdf)、[原样SIM参数快照](reference/smartcar-parameters-20261007.json) |
+| 查看接线设计原图和验收附件 | [修订3单页接线图](reference/智能三轮循迹小车_逐引脚接线图_修订3.pdf)、[10-20工具版本截图](reference/toolchain-versions-20261020.png)、[10-20 SIM参数快照](reference/smartcar-parameters-20261020.json)、[10-07历史快照](reference/smartcar-parameters-20261007.json) |
 | 追溯原软件验证、审计、F103与早期F407说明 | [2026-10-20整理前快照](archive/2026-10-20/README.md) |
 | 维护项目的Agent工作约定 | [技能](agents/skills.md)、[本地任务](agents/issue-tracker.md)、[领域文档约定](agents/domain.md) |
 
